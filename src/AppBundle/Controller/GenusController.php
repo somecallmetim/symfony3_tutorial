@@ -17,17 +17,19 @@ class GenusController extends Controller
     {
         $funFact = 'Octopuses can change the color of their body in just *three-tenths* of a second!';
 
-        $cache = $this->get('doctrine_cache.providers.markdown_cache');
+        $cache = $this->get('doctrine_cache.providers.my_markdown_cache');
         $key = md5($funFact);
-
-        if($cache->contains($key)){
+        if ($cache->contains($key)) {
             $funFact = $cache->fetch($key);
-        }else {
-            sleep(1);
-            $funFact = $this->get('markdown.parser')->transform($funFact);
+        } else {
+            sleep(1); // fake how slow this could be
+            $funFact = $this->get('markdown.parser')
+                ->transform($funFact);
             $cache->save($key, $funFact);
         }
 
+        $this->get('logger')
+            ->info('Showing genus: '.$genusName);
 
         return $this->render('genus/show.html.twig', array(
             'name' => $genusName,
