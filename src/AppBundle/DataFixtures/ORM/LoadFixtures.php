@@ -1,30 +1,27 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Tim'sMac
- * Date: 11/17/2016
- * Time: 2:31 AM
- */
+
 namespace AppBundle\DataFixtures\ORM;
 
+use AppBundle\Entity\Genus;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use AppBundle\Entity\Genus;
 use Nelmio\Alice\Fixtures;
-
 
 class LoadFixtures implements FixtureInterface
 {
     public function load(ObjectManager $manager)
     {
-        Fixtures::load(
+        $objects = Fixtures::load(
             __DIR__.'/fixtures.yml',
             $manager,
-            ['providers' => [$this]]
-            );
+            [
+                'providers' => [$this]
+            ]
+        );
     }
 
-    public function genus(){
+    public function genus()
+    {
         $genera = [
             'Octopus',
             'Balaena',

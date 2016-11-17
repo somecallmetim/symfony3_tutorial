@@ -2,21 +2,20 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Genus;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use AppBundle\Entity\Genus;
 
 class GenusController extends Controller
 {
-
     /**
      * @Route("/genus/new")
      */
-
-    public function newAction(){
+    public function newAction()
+    {
         $genus = new Genus();
         $genus->setName('Octopus'.rand(1, 100));
         $genus->setSubFamily('Octopodinae');
@@ -32,13 +31,15 @@ class GenusController extends Controller
     /**
      * @Route("/genus")
      */
-    public function listAction(){
-
+    public function listAction()
+    {
         $em = $this->getDoctrine()->getManager();
-        $genuses = $em->getRepository('AppBundle:Genus')->findAllPublishedOrderedBySize();
+
+        $genuses = $em->getRepository('AppBundle:Genus')
+            ->findAllPublishedOrderedBySize();
 
         return $this->render('genus/list.html.twig', [
-            'genuses' => $genuses,
+            'genuses' => $genuses
         ]);
     }
 
@@ -49,22 +50,26 @@ class GenusController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $genus = $em->getRepository('AppBundle:Genus')->findOneBy(['name' => $genusName]);
+        $genus = $em->getRepository('AppBundle:Genus')
+            ->findOneBy(['name' => $genusName]);
 
-        if(!$genus){
-            throw $this->createNotFoundException('Genus not found');
+        if (!$genus) {
+            throw $this->createNotFoundException('genus not found');
         }
 
-//        $cache = $this->get('doctrine_cache.providers.my_markdown_cache');
-//        $key = md5($funFact);
-//        if ($cache->contains($key)) {
-//            $funFact = $cache->fetch($key);
-//        } else {
-//            sleep(1); // fake how slow this could be
-//            $funFact = $this->get('markdown.parser')
-//                ->transform($funFact);
-//            $cache->save($key, $funFact);
-//        }
+        // todo - add the caching back later
+        /*
+        $cache = $this->get('doctrine_cache.providers.my_markdown_cache');
+        $key = md5($funFact);
+        if ($cache->contains($key)) {
+            $funFact = $cache->fetch($key);
+        } else {
+            sleep(1); // fake how slow this could be
+            $funFact = $this->get('markdown.parser')
+                ->transform($funFact);
+            $cache->save($key, $funFact);
+        }
+        */
 
         $this->get('logger')
             ->info('Showing genus: '.$genusName);
