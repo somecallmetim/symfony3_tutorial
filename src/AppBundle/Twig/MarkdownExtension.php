@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Tim'sMac
- * Date: 11/19/2016
- * Time: 11:33 AM
- */
 
 namespace AppBundle\Twig;
 
@@ -19,15 +13,6 @@ class MarkdownExtension extends \Twig_Extension
         $this->markdownTransformer = $markdownTransformer;
     }
 
-    public function parseMarkdown($str)
-    {
-        return $this->markdownTransformer->parse($str);
-    }
-
-    public function getName(){
-        return 'app_markdodwn';
-    }
-
     public function getFilters()
     {
         return [
@@ -35,5 +20,15 @@ class MarkdownExtension extends \Twig_Extension
                 'is_safe' => ['html']
             ])
         ];
+    }
+
+    public function parseMarkdown($str)
+    {
+        return $this->markdownTransformer->parse($str);
+    }
+
+    public function getName()
+    {
+        return 'app_markdown';
     }
 }
