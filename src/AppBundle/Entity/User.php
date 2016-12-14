@@ -1,15 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: timbauer
- * Date: 12/6/16
- * Time: 5:28 PM
- */
 
 namespace AppBundle\Entity;
 
-
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -17,7 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity
  * @ORM\Table(name="user")
- * @UniqueEntity(fields={"email"}, message="Looks like you already have an account... :-)")
+ * @UniqueEntity(fields={"email"}, message="It looks like you already have an account!")
  */
 class User implements UserInterface
 {
@@ -36,21 +30,26 @@ class User implements UserInterface
     private $email;
 
     /**
+     * The encoded password
+     *
      * @ORM\Column(type="string")
      */
     private $password;
 
+    /**
+     * A non-persisted field that's used to create the encoded password.
+     * @Assert\NotBlank(groups={"Registration"})
+     *
+     * @var string
+     */
+    private $plainPassword;
 
     /**
      * @ORM\Column(type="json_array")
      */
     private $roles = [];
 
-    /**
-     * @Assert\NotBlank(groups={"Registration"})
-     */
-    private $plainPassword;
-
+    // needed by the security system
     public function getUsername()
     {
         return $this->email;
@@ -60,38 +59,27 @@ class User implements UserInterface
     {
         $roles = $this->roles;
 
-        if(!in_array('ROLE_USER', $roles)){
+        // give everyone ROLE_USER!
+        if (!in_array('ROLE_USER', $roles)) {
             $roles[] = 'ROLE_USER';
         }
 
         return $roles;
     }
 
-    /**
-     * @param mixed $roles
-     */
-    public function setRoles($roles)
+    public function setRoles(array $roles)
     {
         $this->roles = $roles;
     }
-
 
     public function getPassword()
     {
         return $this->password;
     }
 
-    /**
-     * @param mixed $password
-     */
-    public function setPassword($password)
-    {
-        $this->password = $password;
-    }
-
     public function getSalt()
     {
-        // TODO: Implement getSalt() method.
+        // leaving blank - I don't need/have a password!
     }
 
     public function eraseCredentials()
@@ -99,36 +87,29 @@ class User implements UserInterface
         $this->plainPassword = null;
     }
 
-    public function setEmail($email)
-    {
-        $this->email = $email;
-    }
-
-    /**
-     * @return mixed
-     */
     public function getEmail()
     {
         return $this->email;
     }
 
+    public function setEmail($email)
+    {
+        $this->email = $email;
+    }
 
+    public function setPassword($password)
+    {
+        $this->password = $password;
+    }
 
-    /**
-     * @return mixed
-     */
     public function getPlainPassword()
     {
         return $this->plainPassword;
     }
 
-    /**
-     * @param mixed $plainPassword
-     */
     public function setPlainPassword($plainPassword)
     {
         $this->plainPassword = $plainPassword;
-
         // forces the object to look "dirty" to Doctrine. Avoids
         // Doctrine *not* saving this entity, if only plainPassword changes
         $this->password = null;
