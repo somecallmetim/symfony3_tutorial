@@ -2,6 +2,9 @@
 
 namespace AppBundle\Entity;
 
+use AppBundle\Entity\Genus;
+use AppBundle\Entity\GenusScientist;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -9,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
  * @ORM\Table(name="user")
  * @UniqueEntity(fields={"email"}, message="It looks like you already have an account!")
  */
@@ -48,6 +51,46 @@ class User implements UserInterface
      * @ORM\Column(type="json_array")
      */
     private $roles = [];
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isScientist = false;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $firstName;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $lastName;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $avatarUri;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $universityName;
+
+    /**
+     * @ORM\OneToMany(targetEntity="GenusScientist", mappedBy="user")
+     */
+    private $studiedGenuses;
+
+    public function __construct()
+    {
+        $this->studiedGenuses = new ArrayCollection();
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
 
     // needed by the security system
     public function getUsername()
@@ -114,4 +157,67 @@ class User implements UserInterface
         // Doctrine *not* saving this entity, if only plainPassword changes
         $this->password = null;
     }
+
+    public function isScientist()
+    {
+        return $this->isScientist;
+    }
+
+    public function setIsScientist($isScientist)
+    {
+        $this->isScientist = $isScientist;
+    }
+
+    public function getFirstName()
+    {
+        return $this->firstName;
+    }
+
+    public function setFirstName($firstName)
+    {
+        $this->firstName = $firstName;
+    }
+
+    public function getLastName()
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName($lastName)
+    {
+        $this->lastName = $lastName;
+    }
+
+    public function getAvatarUri()
+    {
+        return $this->avatarUri;
+    }
+
+    public function setAvatarUri($avatarUri)
+    {
+        $this->avatarUri = $avatarUri;
+    }
+
+    public function getUniversityName()
+    {
+        return $this->universityName;
+    }
+
+    public function setUniversityName($universityName)
+    {
+        $this->universityName = $universityName;
+    }
+
+    public function getFullName()
+    {
+        return trim($this->getFirstName().' '.$this->getLastName());
+    }
+
+    /**
+     * @return ArrayCollection|GenusScientist[]
+     */
+    public function getStudiedGenuses(){
+        return $this->studiedGenuses;
+    }
+
 }
